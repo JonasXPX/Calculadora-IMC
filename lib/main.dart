@@ -24,6 +24,52 @@ class _HomeState extends State<Home> {
     });
   }
   
+  TextEditingController weightController = TextEditingController();
+  TextEditingController heigthController = TextEditingController();
+
+  String _infoText = "Informe seus dados!";
+
+  void _resetFields() {
+    setState(() {
+      weightController.text = "";
+      heigthController.text = "";
+      _infoText = "Informe seus dados!"; 
+    });
+  }
+
+  void calculate() {
+    if(heigthController.text == "" || weightController.text == "") {
+      return;
+    }
+
+    double weight = double.parse(weightController.text);
+    double height = double.parse(heigthController.text) / 100;
+
+    double imc = weight / (height * height);
+
+    print("Height ${height} - Weight ${weight}");
+
+    print(imc);
+      setState(() {
+        if(imc < 18.6) {
+            _infoText = "Abaixo do Peso (${imc.toStringAsPrecision(4)})"; 
+        } else if (imc >= 18.6 && imc <= 24.9) {
+            _infoText = "Peso Ideal (${imc.toStringAsPrecision(4)})"; 
+        } else if (imc >= 25.0 && imc <= 29.9) {
+            _infoText = "Levemente Acima do peso (${imc.toStringAsPrecision(4)})"; 
+        } else if (imc >= 30.0 && imc <= 34.9) {
+            _infoText = "Obesidade 1º (${imc.toStringAsPrecision(4)})"; 
+        } else if (imc >= 35.0 && imc <= 39.9) {
+            _infoText = "Obesidade 2º (severa) (${imc.toStringAsPrecision(4)})"; 
+        } else if (imc >= 40.0) {
+            _infoText = "Obesidade 3º (mórbida) (${imc.toStringAsPrecision(4)})"; 
+        }
+      }); 
+  }
+
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,7 +80,7 @@ class _HomeState extends State<Home> {
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.refresh),
-            onPressed: (){},
+            onPressed: _resetFields,
           )
         ],
       ),
@@ -55,6 +101,7 @@ class _HomeState extends State<Home> {
                   labelStyle: TextStyle(color: _textColor),
                 ),
                 textAlign: TextAlign.center,
+                controller: weightController,
               ),
             
             TextField(
@@ -64,7 +111,7 @@ class _HomeState extends State<Home> {
                   labelStyle: TextStyle(color: _textColor),
                 ),
                 textAlign: TextAlign.center,
-              // onEditingComplete: _updatedPadding(),
+                controller: heigthController,
               ),
 
               AnimatedPadding(
@@ -75,13 +122,13 @@ class _HomeState extends State<Home> {
                     height: 50.0,
                     margin: EdgeInsets.all(5.0),
                     child: RaisedButton(
-                        onPressed: (){},
+                        onPressed: calculate,
                         child: Text("Calcular", style: TextStyle(color: _textColor, fontSize: 23.0),),
                         color: Color.fromRGBO(232, 197, 71, 1),
                       ),
                   ),
               ),
-              Text("Info", textAlign: TextAlign.center, style: TextStyle(color: _textColor, fontSize: 25.0),)
+              Text(_infoText, textAlign: TextAlign.center, style: TextStyle(color: _textColor, fontSize: 25.0),)
           ],
         ),
       ),
