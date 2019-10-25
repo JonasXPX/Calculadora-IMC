@@ -27,21 +27,20 @@ class _HomeState extends State<Home> {
   TextEditingController weightController = TextEditingController();
   TextEditingController heigthController = TextEditingController();
 
+  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   String _infoText = "Informe seus dados!";
 
   void _resetFields() {
+    weightController.text = "";
+    heigthController.text = "";
     setState(() {
-      weightController.text = "";
-      heigthController.text = "";
       _infoText = "Informe seus dados!"; 
+      _formKey = GlobalKey<FormState>();
     });
   }
 
   void calculate() {
-    if(heigthController.text == "" || weightController.text == "") {
-      return;
-    }
-
     double weight = double.parse(weightController.text);
     double height = double.parse(heigthController.text) / 100;
 
@@ -89,48 +88,64 @@ class _HomeState extends State<Home> {
 
       body: SingleChildScrollView(
         padding: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Icon(Icons.person_outline, size: 120, color: Color.fromRGBO(232, 197, 71, 1),),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Icon(Icons.person_outline, size: 120, color: Color.fromRGBO(232, 197, 71, 1),),
 
-            TextField(
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                  labelText: 'Peso (kg)',
-                  labelStyle: TextStyle(color: _textColor),
-                ),
-                textAlign: TextAlign.center,
-                controller: weightController,
-              ),
-            
-            TextField(
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                  labelText: 'Altura (cm)',
-                  labelStyle: TextStyle(color: _textColor),
-                ),
-                textAlign: TextAlign.center,
-                controller: heigthController,
-              ),
-
-              AnimatedPadding(
-                duration: const Duration(seconds: 1),
-                curve: Curves.easeInOut,
-                padding: EdgeInsets.all(padValue),
-                child: Container(
-                    height: 50.0,
-                    margin: EdgeInsets.all(5.0),
-                    child: RaisedButton(
-                        onPressed: calculate,
-                        child: Text("Calcular", style: TextStyle(color: _textColor, fontSize: 23.0),),
-                        color: Color.fromRGBO(232, 197, 71, 1),
-                      ),
+              TextFormField(
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                    labelText: 'Peso (kg)',
+                    labelStyle: TextStyle(color: _textColor),
                   ),
-              ),
-              Text(_infoText, textAlign: TextAlign.center, style: TextStyle(color: _textColor, fontSize: 25.0),)
-          ],
-        ),
+                  textAlign: TextAlign.center,
+                  controller: weightController,
+                  validator: (value) {
+                    if(value.isEmpty)
+                      return "Insira seu Peso";
+                  },
+                ),
+              
+              TextFormField(
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                    labelText: 'Altura (cm)',
+                    labelStyle: TextStyle(color: _textColor),
+                  ),
+                  textAlign: TextAlign.center,
+                  controller: heigthController,
+                  validator: (String value) {
+                    if(value.isEmpty){
+                      return "Insira seu Altura";
+                    }
+                  },
+                ),
+
+                AnimatedPadding(
+                  duration: const Duration(seconds: 1),
+                  curve: Curves.easeInOut,
+                  padding: EdgeInsets.all(padValue),
+                  child: Container(
+                      height: 50.0,
+                      margin: EdgeInsets.all(5.0),
+                      child: RaisedButton(
+                          onPressed: (){
+                            if(_formKey.currentState.validate()) {
+                              calculate();
+                            }
+                          },
+                          child: Text("Calcular", style: TextStyle(color: _textColor, fontSize: 23.0),),
+                          color: Color.fromRGBO(232, 197, 71, 1),
+                        ),
+                    ),
+                ),
+                Text(_infoText, textAlign: TextAlign.center, style: TextStyle(color: _textColor, fontSize: 25.0),)
+            ],
+          ),
+        )
       ),
     );
   }
